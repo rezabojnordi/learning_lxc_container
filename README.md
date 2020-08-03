@@ -137,7 +137,7 @@ Lxc exec myvm bash
 
 ### Note :how add lxc container nested
 
-Make configuration
+## Make configuration
 
 Lxc stop myvm
 
