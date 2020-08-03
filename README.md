@@ -155,9 +155,66 @@ Lxc config set myvm security.nesting true
              Limits.cpu: 1
 
 
+## how to run apache2 fin lx container
+  
+## Apache Web Server with LXDPermalink
+## This section will create a container, install the Apache web server, and add ## the appropriate iptables rules in order to expose post 80.
 
+### 1. Launch a new container:
 
+lxc launch ubuntu:18.04 web
+
+### 2. Update the package list in the container.
+
+lxc exec web -- apt update
+
+### 3. Install the Apache in the LXD container.
+
+lxc exec web -- apt install apache2
+
+### 4. Get a shell in the LXD container.
+
+lxc exec web -- sudo --user ubuntu --login
+
+### 5. Edit the default web page for Apache to make a reference that it runs inside a LXD container.
+
+sudo nano /var/www/html/index.html
+
+#### Change the line It works! (line number 224) to It works inside a LXD container!. Then, save and exit.
+### 6. Exit back to the host. We have made all the necessary changes to the container.
+
+exit
+
+### 7. Add a LXD proxy device to redirect connections from the internet to port 80 (HTTP) on the server to port 80 at this container.
+
+sudo lxc config device add web myport80 proxy listen=tcp:0.0.0.0:80 connect=tcp:127.0.0.1:80
+
+```
+Note
+In recent versions of LXD, you need to specify an IP address (such as 127.0.0.1) instead of a hostname (such as localhost). If your container already has a proxy device that uses hostnames, you can edit the container configuration to replace with IP addresses by running lxc config edit web.
 Information for configuration container
+```
+
+### 8. From your local computer, navigate to your Linode’s public IP address in a web browser. You should see the default Apache page:
+
+
+### how to update and upgrade container
+
+lxc exec mycontainer -- apt update
+lxc exec mycontainer -- apt upgrade
+
+#### Open a shell session within mycontainer:
+
+lxc exec mycontainer -- sudo --login --user ubuntu
+
+### how to show log
+
+### View the container logs:
+
+lxc info mycontainer --show-log
+
+
+
 https://linuxcontainers.org/lxc/manpages/man5/lxc.container.conf.5.html
 https://www.kernel.org/doc/Documentation/cgroup-v1/cpusets.txt
 
